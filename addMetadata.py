@@ -163,7 +163,7 @@ def get_metadata_spotify(spotify, song_name):
         call spotify.com api to get the metadata required, as much as possible
     '''
 
-    print("trying to find data on Spotify...")
+    print("Trying to find data on Spotify...")
     metadata = {}
     try:
         meta_tags = spotify.search(song_name, limit=1)['tracks']['items'][0]
@@ -189,7 +189,7 @@ def get_metadata_spotify(spotify, song_name):
             metadata['genre'] = titlecase(artist_meta_tags['genres'][0])
 
         except IndexError:
-            print("song genre could not be found.")
+            print("Song genre could not be found.")
             pass
 
     metadata['track_num'] = meta_tags['track_number']
@@ -219,7 +219,7 @@ def set_metadata(file_name, metadata):
         call eyed3 module to set mp3 song metadata as received from spotify
     '''
 
-    print("setting metadata for " + file_name)
+    print("Setting metadata for " + file_name)
     print()
     audiofile = eyed3.load(file_name)
     tag = audiofile.tag
@@ -279,7 +279,7 @@ def rename_to_format(file_name, norename, rename_format, metadata):
     song_title = song_title[:-1] if song_title.endswith('-') else song_title
     song_title = ' '.join(song_title.split()).strip()
 
-    print("renaming " + file_name + "to " + song_title)
+    print("Renaming " + file_name + " to " + song_title)
     new_path = path.dirname(file_name) + '{}.mp3'.format(song_title)
     rename(file_name, new_path)
     return new_path
