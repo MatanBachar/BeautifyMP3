@@ -224,6 +224,14 @@ def set_metadata(file_name, metadata):
     audiofile = eyed3.load(file_name)
     tag = audiofile.tag
 
+    tag.title = metadata['title']
+    tag.artist = metadata['artist']
+    tag.album = metadata['album']
+    tag.release_date = metadata['release_date']
+    tag.album_artist = metadata['album_artist']
+    tag.track_num = metadata['track_num']
+    tag.disc_num = metadata['disc_num']
+
     if 'genre' in metadata:
         tag.genre = metadata['genre']
 
