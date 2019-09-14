@@ -211,8 +211,6 @@ def list_files():
     '''
         list all files in current directory with extension .mp3
     '''
-
-    files = []
     return [f for f in listdir('.') if f.endswith('.mp3')]
 
 
@@ -240,21 +238,6 @@ def set_metadata(file_name, metadata):
     tag.images.set(3, albumart, 'image/jpeg')
 
     tag.save(version=(2, 3, 0))
-
-    # if not norename:
-    #     song_title = rename_format.format(
-    #         title=metadata['title'] + ' -',
-    #         artist=metadata['artist'] + ' -',
-    #         album=metadata['album'] + ' -')
-
-    # song_title = song_title[:-1] if song_title.endswith('-') else song_title
-    # song_title = ' '.join(song_title.split()).strip()
-
-    # print("renaming " + file_name + "to " + song_title)
-    # new_path = path.dirname(file_name) + '{}.mp3'.format(song_title)
-    # rename(file_name, new_path)
-
-    print()
     return
 
 
