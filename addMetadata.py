@@ -20,7 +20,7 @@ import sys
 import shutil
 import os
 from os import chdir, listdir, rename, walk, path, environ
-from os.path import basename, dirname, realpath
+from os.path import basename, dirname, realpath, join
 import spotipy
 import argparse
 import configparser
@@ -99,7 +99,6 @@ def improve_song_name(song):
     song = song.strip()
     song = song.lstrip("0123456789.- ")
     # re.sub(reg_exp, '', song)
-    song = song[0:-4]
     song = ''.join(
         map(lambda c: " " if c in char_filters else c, song))
 
@@ -203,7 +202,6 @@ def get_metadata_spotify(spotify, song_name):
     if lyrics is not None:
         metadata['lyrics'] = lyrics
 
-    print()
     return metadata
 
 
@@ -220,12 +218,12 @@ def set_metadata(file_name, metadata):
     '''
 
     print("Setting metadata for " + file_name)
-    print()
     audiofile = eyed3.load(file_name)
+
     tag = audiofile.tag
 
-    tag.title = metadata['title']
     tag.artist = metadata['artist']
+    tag.title = metadata['title']
     tag.album = metadata['album']
     tag.release_date = metadata['release_date']
     tag.album_artist = metadata['album_artist']
@@ -251,10 +249,8 @@ def set_metadata(file_name, metadata):
 
 def fix_music_file(spotify, file_name, norename, rename_format):
     print("------------------------------------------------------------------------")
-    print()
-    print()
     print("Currently processing " + file_name)
-    metadata = get_metadata_spotify(spotify, improve_song_name(file_name))
+    metadata = get_metadata_spotify(spotify, improve_song_name(basename(file_name)))
     if not metadata:
         is_improvemet_needed = True
         return is_improvemet_needed
@@ -265,7 +261,6 @@ def fix_music_file(spotify, file_name, norename, rename_format):
         rename_file = rename_to_format(
             file_name, norename, rename_format, metadata)
 
-        shutil.move(rename_file, 'Music')
         return is_improvemet_needed
 
 
@@ -279,8 +274,8 @@ def rename_to_format(file_name, norename, rename_format, metadata):
     song_title = song_title[:-1] if song_title.endswith('-') else song_title
     song_title = ' '.join(song_title.split()).strip()
 
-    print("Renaming " + file_name + " to " + song_title)
-    new_path = path.dirname(file_name) + '{}.mp3'.format(song_title)
+    print(f"Renaming {file_name} to {song_title}.mp3")
+    new_path = os.path.join(path.dirname(file_name), f'{song_title}.mp3')
     rename(file_name, new_path)
     return new_path
 
@@ -294,10 +289,15 @@ def fix_music_files(spotify, files, norename, rename_format):
             need_to_improve.append(file_name)
 
         ("------------------------------------------------------------------------")
-        print()
-        print()
 
     return need_to_improve
+
+
+def get_spotify_adapter():
+    auth = oauth2.SpotifyClientCredentials(
+        client_id="622a0e16a4914e3eadc2a37b4a134f1e", client_secret="6fe008a8b7754954a58a9849fa3172df")
+    token = auth.get_access_token()
+    return spotipy.Spotify(auth=token)
 
 
 def main():
@@ -340,10 +340,7 @@ def main():
     if config:
         add_config_keys()
 
-    auth = oauth2.SpotifyClientCredentials(
-        client_id="622a0e16a4914e3eadc2a37b4a134f1e", client_secret="6fe008a8b7754954a58a9849fa3172df")
-    token = auth.get_access_token()
-    spotify = spotipy.Spotify(auth=token)
+    spotify = get_spotify_adapter()
 
     files = []
 
